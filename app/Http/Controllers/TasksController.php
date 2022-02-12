@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
 use App\Models\Task;
 use App\Models\Status;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class TasksController extends Controller
 {
@@ -12,9 +15,9 @@ class TasksController extends Controller
      * Display a listing of the resource.
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $order = $request->sort ?? 'desc';
         $select_statuses = $request->statuses ?? [];
@@ -30,9 +33,9 @@ class TasksController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
         return view('task.create');
     }
@@ -40,16 +43,11 @@ class TasksController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param StoreTaskRequest $request
+     * @return RedirectResponse
      */
-    public function store(Request $request)
+    public function store(StoreTaskRequest $request): RedirectResponse
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-        ]);
-
         Task::create($request->all());
 
         return redirect()->route('tasks.index')->with('success', 'Task created successfully.');
@@ -58,10 +56,10 @@ class TasksController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  Task $task
-     * @return \Illuminate\Http\Response
+     * @param Task $task
+     * @return View
      */
-    public function show(Task $task)
+    public function show(Task $task): View
     {
         return view('task.show', compact('task'));
     }
@@ -69,10 +67,10 @@ class TasksController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param Task $task
+     * @return View
      */
-    public function edit(Task $task)
+    public function edit(Task $task): View
     {
         $statuses = Status::all();
         return view('task.edit', compact('task', 'statuses'));
@@ -81,29 +79,23 @@ class TasksController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  Task $task
-     * @return \Illuminate\Http\Response
+     * @param StoreTaskRequest $request
+     * @param Task $task
+     * @return RedirectResponse
      */
-    public function update(Request $request, Task $task)
+    public function update(StoreTaskRequest $request, Task $task): RedirectResponse
     {
-        $request->validate([
-            'title' => 'required',
-            'description' => 'required',
-        ]);
-
         $task->update($request->all());
-
         return redirect()->route('tasks.index')->with('success', 'Task updated successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Task $task
-     * @return \Illuminate\Http\Response
+     * @param Task $task
+     * @return RedirectResponse
      */
-    public function destroy(Task $task)
+    public function destroy(Task $task): RedirectResponse
     {
         $task->delete();
 
